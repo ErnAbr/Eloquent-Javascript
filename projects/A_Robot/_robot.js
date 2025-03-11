@@ -168,6 +168,35 @@ function compareRobots(robot1, memory1, robot2, memory2) {
   console.log("second robot average", result2 / measurement);
 }
 
-compareRobots(routeRobot, [], goalOrientedRobot, []);
+// compareRobots(routeRobot, [], goalOrientedRobot, []);
 
 // #2 Robot Efficiency
+function efficientRobot(state, memory) {
+  let { place, parcels } = state;
+
+  if (memory.length == 0) {
+    let routes = parcels.map((parcel) => {
+      if (parcel.place !== place) {
+        return {
+          route: findRoute(roadGraph, place, parcel.place),
+          pickUp: true,
+          parcel,
+        };
+      } else {
+        return {
+          route: findRoute(roadGraph, place, parcel.address),
+          pickUp: false,
+          parcel,
+        };
+      }
+    });
+
+    routes.sort((a, b) => a.route.length - b.route.length);
+    memory = routes[0].route;
+  }
+
+  return { direction: memory[0], memory: memory.slice(1) };
+}
+
+// runRobot(VillageState.random(5), efficientRobot, []);
+// compareRobots(goalOrientedRobot, [], efficientRobot, []);
