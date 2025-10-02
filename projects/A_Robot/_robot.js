@@ -200,3 +200,5 @@ function efficientRobot(state, memory) {
 
 // runRobot(VillageState.random(5), efficientRobot, []);
 // compareRobots(goalOrientedRobot, [], efficientRobot, []);
+
+// #3 Persistant Group
