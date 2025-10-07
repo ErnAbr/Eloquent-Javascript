@@ -167,4 +167,93 @@ function compareRobots(robot1, memory1, robot2, memory2) {
   console.log("robot2", result2.toFixed(3));
 }
 
-compareRobots(routeRobot, [], goalOrientedRobot, []);
+// compareRobots(routeRobot, [], goalOrientedRobot, []);
+
+// #2 Robot Efficiency
+
+function efficientRobot({ place, parcels }, route) {
+  if (route.length == 0) {
+    let routes = parcels.map((parcel) => {
+      if (parcel.place != place) {
+        return {
+          route: findRoute(roadGraph, place, parcel.place),
+          pickUp: true,
+        };
+      } else {
+        return {
+          route: findRoute(roadGraph, place, parcel.address),
+          pickUp: false,
+        };
+      }
+    });
+  }
+
+  return { direction: route[0], memory: route.slice(1) };
+}
+
+// Answer
+
+function lazyRobot({ place, parcels }, route) {
+  if (route.length == 0) {
+    let routes = parcels.map((parcel) => {
+      if (parcel.place != place) {
+        return {
+          route: findRoute(roadGraph, place, parcel.place),
+          pickUp: true,
+        };
+      } else {
+        return {
+          route: findRoute(roadGraph, place, parcel.address),
+          pickUp: false,
+        };
+      }
+    });
+
+    function score({ route, pickUp }) {
+      return (pickUp ? 0.5 : 0) - route.length;
+    }
+    route = routes.reduce((a, b) => (score(a) > score(b) ? a : b)).route;
+  }
+
+  return { direction: route[0], memory: route.slice(1) };
+}
+
+// runRobot(VillageState.random(), goalOrientedRobot, mailRoute);
+// runRobot(VillageState.random(), efficientRobot, mailRoute);
+// compareRobots(efficientRobot, [], goalOrientedRobot, []);
+
+// #3 Persistent Group
+
+class PGroup {
+  _members;
+  constructor(members) {
+    this._members = members;
+  }
+
+  add(value) {
+    if (this.has(value)) return this._members;
+    return new PGroup(this._members.concat(value));
+  }
+
+  delete(value) {
+    if (this.has(value)) {
+      return new PGroup(
+        (this._members = this._members.filter((val) => val !== value))
+      );
+    }
+  }
+
+  has(value) {
+    return this._members.includes(value);
+  }
+
+  static empty = new PGroup([]);
+}
+
+let a = PGroup.empty.add("a");
+let ab = a.add("b");
+let b = ab.delete("a");
+
+console.log(b.has("b"));
+console.log(a.has("b"));
+console.log(b.has("a"));
